@@ -38,6 +38,9 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
   const { mutate: createStripeSession, status } = createStripeSessionMutation;
   const isLoading = status === 'pending';
 
+  // Type guard for name property
+  const subscriptionPlanName = 'name' in subscriptionPlan ? subscriptionPlan.name : 'Unknown';
+
   return (
     <MaxWidthWrapper className='max-w-5xl'>
       <form
@@ -50,12 +53,13 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
           <CardHeader>
             <CardTitle>Subscription Plan</CardTitle>
             <CardDescription>
-              {/* Removed the usage of subscriptionPlan.name */}
+              You are currently on the{' '}
+              <strong>{subscriptionPlanName}</strong> plan.
             </CardDescription>
           </CardHeader>
 
           <CardFooter className='flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0'>
-            <Button type='submit'>
+            <Button type='submit' disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className='mr-4 h-4 w-4 animate-spin' />
               ) : null}
@@ -69,7 +73,11 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
                 {subscriptionPlan.isCanceled
                   ? 'Your plan will be canceled on '
                   : 'Your plan renews on '}
-                {subscriptionPlan.stripeCurrentPeriodEnd ? format(subscriptionPlan.stripeCurrentPeriodEnd, 'dd.MM.yyyy') : 'N/A'}.
+                {format(
+                  subscriptionPlan.stripeCurrentPeriodEnd!,
+                  'dd.MM.yyyy'
+                )}
+                .
               </p>
             ) : null}
           </CardFooter>
