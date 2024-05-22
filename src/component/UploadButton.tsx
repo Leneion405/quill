@@ -12,22 +12,30 @@ import { useState } from "react";
 
 import Dropzone from "react-dropzone"
 
-const UploadDropzone = () => {
+const UploadDropzone = ({
+  isSubscribed,
+}: {
+  isSubscribed: boolean
+}) => {
   const router = useRouter()
 
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [uploadProgress, setUploadProgress] = useState<number>(0)
     const { toast } = useToast()
 
-    const { startUpload } = useUploadThing("pdfUploader")
-
-    const {mutate: startPolling} = trpc.getFile.useMutation({
-      onSuccess: (file) => {
-        router.push(`/dashboard/${file.id}`)
-      },
-      retry: true,
-      retryDelay: 500
-    })
+    const { startUpload } = useUploadThing(
+      isSubscribed ? 'proPlanUploader' : 'freePlanUploader'
+    )
+  
+    const { mutate: startPolling } = trpc.getFile.useMutation(
+      {
+        onSuccess: (file) => {
+          router.push(`/dashboard/${file.id}`)
+        },
+        retry: true,
+        retryDelay: 500,
+      }
+    )
 
     const startSimulatedProgress = () => {
         setUploadProgress(0)
@@ -97,7 +105,7 @@ const UploadDropzone = () => {
                   or drag and drop
                 </p>
                 <p className='text-xs text-zinc-500'>
-                  PDF (up to 4MB)
+                  PDF (up to {isSubscribed ? "16" : "4"}MB)
                 </p>
                 </div>
 
@@ -144,8 +152,9 @@ const UploadDropzone = () => {
     )
 }
 
-const UploadButton = () => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
     return (
         <Dialog
@@ -160,7 +169,7 @@ const UploadButton = () => {
                 <Button onClick={() => setIsOpen(true)}>Upload PDF</Button>
             </DialogTrigger>
             <DialogContent>
-              <UploadDropzone />
+            <UploadDropzone isSubscribed={isSubscribed} />
             </DialogContent>
         </Dialog>
     );

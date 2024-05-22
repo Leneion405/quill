@@ -1,32 +1,27 @@
-import Dashboard from '@/component/Dashboard';
-import { db } from '@/db';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { redirect } from 'next/navigation';
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { redirect } from "next/navigation";
 
-const Page = async () => {
+import { db } from "@/db";
+import { getUserSubscriptionPlan } from "@/lib/stripe";
+import Dashboard from "@/component/Dashboard";
+
+const DashboardPage = async () => {
   const { getUser } = getKindeServerSession();
-  const user = await getUser();  // Correctly awaiting the promise
+  const user = await getUser();
 
-  // Check if the user is null or undefined, or if user.id is missing
-  if (!user || !user.id) {
-    redirect('/auth-callback?origin=dashboard');
-    return null;  // Exiting the function to avoid further execution
-  }
+  if (!user || !user.id) redirect("/auth-callback?origin=dashboard");
 
-  // Query the database to find the user
-  const dbUser = await db.user.findFirst({
+  const dbUser = await db.user.findUnique({
     where: {
-      id: user.id
-    }
+      id: user.id,
+    },
   });
 
-  if (!dbUser) {
-    redirect('/auth-callback?origin=dashboard');
-    return null;  
-  }
+  if (!dbUser) redirect("/auth-callback?origin=dashboard");
 
-  
-  return <Dashboard />;
+  const subscriptionPlan = await getUserSubscriptionPlan();
+
+  return <Dashboard subscriptionPlan={subscriptionPlan} />;
 };
 
-export default Page;
+export default DashboardPage;
