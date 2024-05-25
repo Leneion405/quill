@@ -38,7 +38,7 @@ const PdfFullscreen = ({ fileUrl }: PdfFullscreenProps) => {
           aria-label='fullscreen'>
           <Expand className='h-4 w-4' />
         </Button>
-      </DialogTrigger>
+      </DialogTrigger>      
       <DialogContent className='max-w-7xl w-full'>
         <SimpleBar
           autoHide={false}

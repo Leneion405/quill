@@ -1,5 +1,5 @@
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { privateProcedure, publicProcedure, router } from './trpc';
+import { privateProcedure, procedure, router } from './trpc';
 import { TRPCError } from '@trpc/server';
 import { db } from '@/db';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import { getUserSubscriptionPlan, stripe } from '@/lib/stripe';
 import { PLANS } from '@/config/stripe';
 
 export const appRouter = router({
-  authCallback: publicProcedure.query(async () => {
+  authCallback: procedure.query(async () => {
     const { getUser } = getKindeServerSession();
     const user = await getUser(); // Assuming getUser is asynchronous, make sure to await it if that's the case
 
